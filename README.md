@@ -2,7 +2,7 @@
 
 An evidence-based AI application that answers questions from uploaded academic PDFs using semantic retrieval, local extractive question answering, and page-level citations.
 
-![Academic Research Assistant interface](assets/demo.png)
+![Academic Research Assistant interface](assets/demo-v2.png)
 
 ![Tests](https://github.com/alongholyalone-hue/academic-research-assistant/actions/workflows/tests.yml/badge.svg)
 
