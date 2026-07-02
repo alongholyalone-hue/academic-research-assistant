@@ -6,4 +6,5 @@ __pycache__/
 .DS_Store
 Thumbs.db
 .venv/
-evaluation/generated/local_test_files/
+local_test_files/
+evaluation/generated/

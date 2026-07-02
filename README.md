@@ -217,6 +217,7 @@ academic-research-assistant/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
+```
 
 ## Installation
 
