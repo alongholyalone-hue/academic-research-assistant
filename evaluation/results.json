@@ -1,0 +1,234 @@
+{
+  "metrics": {
+    "total_questions": 10,
+    "answerable_questions": 8,
+    "unsupported_questions": 2,
+    "retrieval_hit_at_3": 1.0,
+    "answer_accuracy": 0.875,
+    "citation_accuracy": 1.0,
+    "refusal_accuracy": 1.0,
+    "overall_success_rate": 0.9
+  },
+  "results": [
+    {
+      "id": "q1",
+      "question": "What time does the academic library open on weekdays?",
+      "should_answer": true,
+      "expected_text": "8:00 AM",
+      "expected_page": 1,
+      "retrieved_pages": [
+        1,
+        2,
+        4
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "8:00 AM",
+      "answered": true,
+      "answer_correct": true,
+      "citation_page": 1,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.9931453141340718,
+      "retrieval_score": 0.8739770650863647,
+      "passed": true
+    },
+    {
+      "id": "q2",
+      "question": "What time does the library close?",
+      "should_answer": true,
+      "expected_text": "9:00 PM",
+      "expected_page": 1,
+      "retrieved_pages": [
+        1,
+        2,
+        4
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "9:00 PM",
+      "answered": true,
+      "answer_correct": true,
+      "citation_page": 1,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.9660356104768368,
+      "retrieval_score": 0.779899001121521,
+      "passed": true
+    },
+    {
+      "id": "q3",
+      "question": "How many vacation days do students receive each year?",
+      "should_answer": true,
+      "expected_text": "fifteen",
+      "expected_page": 2,
+      "retrieved_pages": [
+        2,
+        1,
+        4
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "fifteen",
+      "answered": true,
+      "answer_correct": true,
+      "citation_page": 2,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.941350381332029,
+      "retrieval_score": 0.7637248039245605,
+      "passed": true
+    },
+    {
+      "id": "q4",
+      "question": "On which days is remote work permitted?",
+      "should_answer": true,
+      "expected_text": "Tuesdays and Thursdays",
+      "expected_page": 2,
+      "retrieved_pages": [
+        2,
+        1,
+        4
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "Tuesdays and Thursdays",
+      "answered": true,
+      "answer_correct": true,
+      "citation_page": 2,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.943493836738817,
+      "retrieval_score": 0.7031666040420532,
+      "passed": true
+    },
+    {
+      "id": "q5",
+      "question": "What does responsible artificial intelligence require?",
+      "should_answer": true,
+      "expected_text": "fairness",
+      "expected_page": 3,
+      "retrieved_pages": [
+        3,
+        4,
+        1
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "fairness, transparency, and human oversight",
+      "answered": true,
+      "answer_correct": true,
+      "citation_page": 3,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.8049386437926387,
+      "retrieval_score": 0.8892083764076233,
+      "passed": true
+    },
+    {
+      "id": "q6",
+      "question": "Which programming language is the Academic Research Assistant built with?",
+      "should_answer": true,
+      "expected_text": "Python",
+      "expected_page": 4,
+      "retrieved_pages": [
+        4,
+        3,
+        1
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "Python and FastAPI",
+      "answered": true,
+      "answer_correct": true,
+      "citation_page": 4,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.8367860018399718,
+      "retrieval_score": 0.620479166507721,
+      "passed": true
+    },
+    {
+      "id": "q7",
+      "question": "Which backend framework does the project use?",
+      "should_answer": true,
+      "expected_text": "FastAPI",
+      "expected_page": 4,
+      "retrieved_pages": [
+        4,
+        1,
+        2
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "Streamlit",
+      "answered": true,
+      "answer_correct": false,
+      "citation_page": 4,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.8985219812674927,
+      "retrieval_score": 0.3233666718006134,
+      "passed": false
+    },
+    {
+      "id": "q8",
+      "question": "Which framework is used for the web interface?",
+      "should_answer": true,
+      "expected_text": "Streamlit",
+      "expected_page": 4,
+      "retrieved_pages": [
+        4,
+        2,
+        3
+      ],
+      "retrieval_hit": true,
+      "predicted_answer": "Streamlit",
+      "answered": true,
+      "answer_correct": true,
+      "citation_page": 4,
+      "citation_correct": true,
+      "refusal_correct": null,
+      "answer_confidence": 0.967270680717391,
+      "retrieval_score": 0.38706934452056885,
+      "passed": true
+    },
+    {
+      "id": "q9",
+      "question": "Who won the hockey game yesterday?",
+      "should_answer": false,
+      "expected_text": null,
+      "expected_page": null,
+      "retrieved_pages": [
+        1,
+        2,
+        4
+      ],
+      "retrieval_hit": null,
+      "predicted_answer": "The uploaded document does not provide enough evidence to answer this question.",
+      "answered": false,
+      "answer_correct": null,
+      "citation_page": null,
+      "citation_correct": null,
+      "refusal_correct": true,
+      "answer_confidence": 0.0,
+      "retrieval_score": 0.0,
+      "passed": true
+    },
+    {
+      "id": "q10",
+      "question": "What is the capital of France?",
+      "should_answer": false,
+      "expected_text": null,
+      "expected_page": null,
+      "retrieved_pages": [
+        1,
+        2,
+        4
+      ],
+      "retrieval_hit": null,
+      "predicted_answer": "The uploaded document does not provide enough evidence to answer this question.",
+      "answered": false,
+      "answer_correct": null,
+      "citation_page": null,
+      "citation_correct": null,
+      "refusal_correct": true,
+      "answer_confidence": 0.0,
+      "retrieval_score": 0.0,
+      "passed": true
+    }
+  ]
+}

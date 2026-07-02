@@ -1,0 +1,72 @@
+[
+  {
+    "id": "q1",
+    "question": "What time does the academic library open on weekdays?",
+    "should_answer": true,
+    "expected_text": "8:00 AM",
+    "expected_page": 1
+  },
+  {
+    "id": "q2",
+    "question": "What time does the library close?",
+    "should_answer": true,
+    "expected_text": "9:00 PM",
+    "expected_page": 1
+  },
+  {
+    "id": "q3",
+    "question": "How many vacation days do students receive each year?",
+    "should_answer": true,
+    "expected_text": "fifteen",
+    "expected_page": 2
+  },
+  {
+    "id": "q4",
+    "question": "On which days is remote work permitted?",
+    "should_answer": true,
+    "expected_text": "Tuesdays and Thursdays",
+    "expected_page": 2
+  },
+  {
+    "id": "q5",
+    "question": "What does responsible artificial intelligence require?",
+    "should_answer": true,
+    "expected_text": "fairness",
+    "expected_page": 3
+  },
+  {
+    "id": "q6",
+    "question": "Which programming language is the Academic Research Assistant built with?",
+    "should_answer": true,
+    "expected_text": "Python",
+    "expected_page": 4
+  },
+  {
+    "id": "q7",
+    "question": "Which backend framework does the project use?",
+    "should_answer": true,
+    "expected_text": "FastAPI",
+    "expected_page": 4
+  },
+  {
+    "id": "q8",
+    "question": "Which framework is used for the web interface?",
+    "should_answer": true,
+    "expected_text": "Streamlit",
+    "expected_page": 4
+  },
+  {
+    "id": "q9",
+    "question": "Who won the hockey game yesterday?",
+    "should_answer": false,
+    "expected_text": null,
+    "expected_page": null
+  },
+  {
+    "id": "q10",
+    "question": "What is the capital of France?",
+    "should_answer": false,
+    "expected_text": null,
+    "expected_page": null
+  }
+]
