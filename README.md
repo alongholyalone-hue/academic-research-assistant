@@ -240,6 +240,13 @@ The confidence values are model-ranking scores and should not be interpreted as 
 - Containerized deployment
 - Optional generative-model integration
 
+## Evaluation
+
+A reproducible evaluation measures semantic retrieval, answer extraction,
+citation accuracy, and unsupported-question refusal behaviour.
+
+See [evaluation/results.md](evaluation/results.md) for the complete results.
+
 ## Purpose
 
 This project was developed to strengthen my practical understanding of natural language processing, semantic retrieval, transformer models, API development, testing, and responsible AI system design.
