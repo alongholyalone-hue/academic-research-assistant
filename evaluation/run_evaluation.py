@@ -39,8 +39,9 @@ DOCUMENT_PAGES = [
         "transparency, and human oversight."
     ),
     (
-        "The Academic Research Assistant is built with Python "
-        "and FastAPI. Its web interface uses Streamlit."
+    "The Academic Research Assistant is built with Python. "
+    "Its backend framework is FastAPI. "
+    "Its web interface uses Streamlit."
     ),
 ]
 

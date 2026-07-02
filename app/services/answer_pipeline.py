@@ -1,10 +1,12 @@
 import re
-
 from dataclasses import dataclass
 from pathlib import Path
 
 from app.services.answer_extractor import extract_answer
 from app.services.retrieval_pipeline import retrieve_from_pdf
+from app.services.reranker import rerank_chunks
+from app.services.semantic_search import SearchResult
+from app.services.text_chunker import TextChunk
 
 
 INSUFFICIENT_EVIDENCE_MESSAGE = (
@@ -40,6 +42,72 @@ def clean_answer_text(
     )
 
     return cleaned.strip()
+
+
+def create_sentence_chunks(
+    results: list[SearchResult],
+) -> list[TextChunk]:
+    """Split retrieved passages into sentence-level candidates."""
+
+    sentence_chunks: list[TextChunk] = []
+
+    for result in results:
+        sentences = [
+            sentence.strip()
+            for sentence in re.split(
+                r"(?<=[.!?])\s+",
+                result.chunk.text,
+            )
+            if sentence.strip()
+        ]
+
+        for sentence_index, sentence in enumerate(
+            sentences,
+            start=1,
+        ):
+            sentence_chunks.append(
+                TextChunk(
+                    chunk_id=(
+                        f"{result.chunk.chunk_id}"
+                        f"-sentence-{sentence_index}"
+                    ),
+                    text=sentence,
+                    source=result.chunk.source,
+                    page_number=result.chunk.page_number,
+                    chunk_index=sentence_index,
+                )
+            )
+
+    return sentence_chunks
+
+
+def rerank_sentence_candidates(
+    question: str,
+    results: list[SearchResult],
+    top_k: int,
+) -> list[SearchResult]:
+    """
+    Re-rank individual sentences when retrieved passages contain
+    multiple sentences.
+    """
+
+    sentence_chunks = create_sentence_chunks(results)
+
+    # No additional ranking is needed when every result already
+    # contains only one sentence.
+    if len(sentence_chunks) <= len(results):
+        return results
+
+    candidate_count = min(
+        max(top_k * 2, 3),
+        len(sentence_chunks),
+    )
+
+    return rerank_chunks(
+        query=question,
+        chunks=sentence_chunks,
+        top_k=candidate_count,
+    )
 
 
 @dataclass(frozen=True)
@@ -103,15 +171,40 @@ def answer_from_pdf(
         top_k=top_k,
     )
 
+    # Apply the semantic-retrieval threshold before reranking.
+    # CrossEncoder scores use a different scale and should not
+    # be compared directly with cosine-similarity thresholds.
+    eligible_results = [
+        result
+        for result in retrieval.results
+        if result.score >= minimum_retrieval_score
+    ]
+
+    if not eligible_results:
+        return DocumentAnswer(
+            query=retrieval.query,
+            source=retrieval.source,
+            page_count=retrieval.page_count,
+            chunk_count=retrieval.chunk_count,
+            answered=False,
+            answer=INSUFFICIENT_EVIDENCE_MESSAGE,
+            answer_confidence=0.0,
+            retrieval_score=0.0,
+            citation=None,
+        )
+
+    candidate_results = rerank_sentence_candidates(
+        question=cleaned_question,
+        results=eligible_results,
+        top_k=top_k,
+    )
+
     best_result = None
     best_extracted_answer = None
     best_answer_text: str | None = None
-    best_combined_score = -1.0
+    best_selection_score = (-1.0, -1.0)
 
-    for result in retrieval.results:
-        # Do not run the larger QA model on clearly irrelevant chunks.
-        if result.score < minimum_retrieval_score:
-            continue
+    for result in candidate_results:
 
         extracted = extract_answer(
             question=cleaned_question,
@@ -132,15 +225,16 @@ def answer_from_pdf(
         if extracted.confidence < minimum_answer_confidence:
             continue
 
-        combined_score = (
-            max(result.score, 0.0) * extracted.confidence
+        selection_score = (
+            max(result.score, 0.0),
+            extracted.confidence,
         )
 
-        if combined_score > best_combined_score:
+        if selection_score > best_selection_score:
             best_result = result
             best_extracted_answer = extracted
             best_answer_text = cleaned_answer
-            best_combined_score = combined_score
+            best_selection_score = selection_score
 
     if (
         best_result is None

@@ -4,10 +4,10 @@
     "answerable_questions": 8,
     "unsupported_questions": 2,
     "retrieval_hit_at_3": 1.0,
-    "answer_accuracy": 1.0,
+    "answer_accuracy": 0.875,
     "citation_accuracy": 1.0,
     "refusal_accuracy": 1.0,
-    "overall_success_rate": 1.0
+    "overall_success_rate": 0.9
   },
   "results": [
     {
@@ -29,7 +29,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9923241519992132,
-      "retrieval_score": 0.7333333492279053,
+      "retrieval_score": 0.9999775886535645,
       "passed": true
     },
     {
@@ -51,7 +51,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9684182481710053,
-      "retrieval_score": 0.46666669845581055,
+      "retrieval_score": 0.9999170303344727,
       "passed": true
     },
     {
@@ -73,7 +73,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9534024841176318,
-      "retrieval_score": 0.7333333492279053,
+      "retrieval_score": 0.9999653100967407,
       "passed": true
     },
     {
@@ -95,7 +95,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9557009580819624,
-      "retrieval_score": 0.8400000333786011,
+      "retrieval_score": 0.9999617338180542,
       "passed": true
     },
     {
@@ -139,7 +139,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9896747944312381,
-      "retrieval_score": 0.7714285850524902,
+      "retrieval_score": 0.9998677968978882,
       "passed": true
     },
     {
@@ -161,7 +161,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9893392759653779,
-      "retrieval_score": 0.7333333492279053,
+      "retrieval_score": 0.9989351630210876,
       "passed": true
     },
     {
@@ -176,15 +176,15 @@
         3
       ],
       "retrieval_hit": true,
-      "predicted_answer": "Streamlit",
+      "predicted_answer": "FastAPI",
       "answered": true,
-      "answer_correct": true,
+      "answer_correct": false,
       "citation_page": 4,
       "citation_correct": true,
       "refusal_correct": null,
-      "answer_confidence": 0.9790872397079511,
-      "retrieval_score": 0.6507348418235779,
-      "passed": true
+      "answer_confidence": 0.9835726614041818,
+      "retrieval_score": 0.6525881886482239,
+      "passed": false
     },
     {
       "id": "q9",

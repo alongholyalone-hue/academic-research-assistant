@@ -13,6 +13,7 @@ from app.services.text_chunker import TextChunk
 from app.services.answer_pipeline import (
     INSUFFICIENT_EVIDENCE_MESSAGE,
     clean_answer_text,
+    rerank_sentence_candidates,
 )
 
 
@@ -46,9 +47,9 @@ def test_answer_pipeline_selects_best_candidate(
             retrieval_score=0.72,
         ),
         create_search_result(
-            text="Transparency is a principle of responsible AI.",
-            page_number=2,
-            retrieval_score=0.65,
+             text="Transparency is a principle of responsible AI.",
+             page_number=2,
+             retrieval_score=0.72,
         ),
     ]
 
@@ -99,7 +100,7 @@ def test_answer_pipeline_selects_best_candidate(
     assert response.answered is True
     assert response.answer == "Transparency"
     assert response.answer_confidence == pytest.approx(0.80)
-    assert response.retrieval_score == pytest.approx(0.65)
+    assert response.retrieval_score == pytest.approx(0.72)
 
     assert response.citation is not None
     assert response.citation.page_number == 2
@@ -225,3 +226,200 @@ def test_clean_answer_text_preserves_normal_answer() -> None:
     )
 
     assert result == "fairness and transparency"
+
+
+def test_multi_sentence_passage_is_reranked(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    result = create_search_result(
+        text=(
+            "The application uses Python and FastAPI. "
+            "Its web interface uses Streamlit."
+        ),
+        page_number=4,
+        retrieval_score=0.80,
+    )
+
+    def fake_search_chunks(
+        query: str,
+        chunks: list[TextChunk],
+        top_k: int,
+    ) -> list[SearchResult]:
+        assert query == (
+            "Which backend framework does the project use?"
+        )
+
+        assert len(chunks) == 2
+        assert chunks[0].text == (
+            "The application uses Python and FastAPI."
+        )
+        assert chunks[1].text == (
+            "Its web interface uses Streamlit."
+        )
+
+        return [
+            SearchResult(
+                chunk=chunks[0],
+                score=0.92,
+            ),
+            SearchResult(
+                chunk=chunks[1],
+                score=0.41,
+            ),
+        ]
+
+    monkeypatch.setattr(
+        answer_pipeline,
+        "rerank_chunks",
+        fake_search_chunks,
+    )
+
+    reranked = rerank_sentence_candidates(
+        question=(
+            "Which backend framework does the project use?"
+        ),
+        results=[result],
+        top_k=3,
+    )
+
+    assert reranked[0].chunk.text == (
+        "The application uses Python and FastAPI."
+    )
+    assert reranked[0].chunk.page_number == 4
+    assert reranked[0].chunk.chunk_id.endswith(
+        "-sentence-1"
+    )
+def test_retrieval_relevance_has_priority_over_qa_confidence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fastapi_result = create_search_result(
+        text="The backend framework is FastAPI.",
+        page_number=4,
+        retrieval_score=0.82,
+    )
+
+    streamlit_result = create_search_result(
+        text="The web interface uses Streamlit.",
+        page_number=4,
+        retrieval_score=0.61,
+    )
+
+    retrieval = RetrievalResponse(
+        query="Which backend framework does the project use?",
+        source="evaluation.pdf",
+        page_count=4,
+        chunk_count=4,
+        results=[
+            fastapi_result,
+            streamlit_result,
+        ],
+    )
+
+    monkeypatch.setattr(
+        answer_pipeline,
+        "retrieve_from_pdf",
+        lambda **kwargs: retrieval,
+    )
+
+    monkeypatch.setattr(
+        answer_pipeline,
+        "rerank_sentence_candidates",
+        lambda **kwargs: [
+            fastapi_result,
+            streamlit_result,
+        ],
+    )
+
+    def fake_extract_answer(
+        question: str,
+        context: str,
+    ) -> ExtractedAnswer:
+        if "FastAPI" in context:
+            return ExtractedAnswer(
+                text="FastAPI",
+                confidence=0.30,
+                start_character=25,
+                end_character=32,
+            )
+
+        return ExtractedAnswer(
+            text="Streamlit",
+            confidence=0.95,
+            start_character=23,
+            end_character=32,
+        )
+
+    monkeypatch.setattr(
+        answer_pipeline,
+        "extract_answer",
+        fake_extract_answer,
+    )
+
+    response = answer_pipeline.answer_from_pdf(
+        file_path=Path("evaluation.pdf"),
+        question=(
+            "Which backend framework does the project use?"
+        ),
+    )
+
+    assert response.answered is True
+    assert response.answer == "FastAPI"
+    assert response.retrieval_score == pytest.approx(0.82)
+
+    
+def test_low_cross_encoder_score_does_not_reject_valid_evidence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original_result = create_search_result(
+        text="The backend framework is FastAPI.",
+        page_number=4,
+        retrieval_score=0.82,
+    )
+
+    retrieval = RetrievalResponse(
+        query="Which backend framework does the project use?",
+        source="evaluation.pdf",
+        page_count=4,
+        chunk_count=4,
+        results=[original_result],
+    )
+
+    monkeypatch.setattr(
+        answer_pipeline,
+        "retrieve_from_pdf",
+        lambda **kwargs: retrieval,
+    )
+
+    # CrossEncoder scores are not directly comparable to
+    # embedding cosine-similarity scores.
+    reranked_result = SearchResult(
+        chunk=original_result.chunk,
+        score=0.04,
+    )
+
+    monkeypatch.setattr(
+        answer_pipeline,
+        "rerank_sentence_candidates",
+        lambda **kwargs: [reranked_result],
+    )
+
+    monkeypatch.setattr(
+        answer_pipeline,
+        "extract_answer",
+        lambda **kwargs: ExtractedAnswer(
+            text="FastAPI",
+            confidence=0.90,
+            start_character=25,
+            end_character=32,
+        ),
+    )
+
+    response = answer_pipeline.answer_from_pdf(
+        file_path=Path("evaluation.pdf"),
+        question="Which backend framework does the project use?",
+    )
+
+    assert response.answered is True
+    assert response.answer == "FastAPI"
+    assert response.citation is not None
+    assert response.citation.page_number == 4

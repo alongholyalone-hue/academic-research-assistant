@@ -6,10 +6,10 @@ This evaluation uses a controlled four-page synthetic PDF.
 
 - Total questions: 10
 - Retrieval Hit@3: 100.0%
-- Answer accuracy: 100.0%
+- Answer accuracy: 87.5%
 - Citation accuracy: 100.0%
 - Unsupported-question refusal accuracy: 100.0%
-- Overall success rate: 100.0%
+- Overall success rate: 90.0%
 
 ## Detailed Results
 
@@ -22,7 +22,7 @@ This evaluation uses a controlled four-page synthetic PDF.
 | q5 | fairness | fairness, transparency, and human oversight | [3, 4, 1] | 3 | Yes |
 | q6 | Python | Python | [4, 3, 1] | 4 | Yes |
 | q7 | FastAPI | FastAPI | [4, 1, 2] | 4 | Yes |
-| q8 | Streamlit | Streamlit | [4, 2, 3] | 4 | Yes |
+| q8 | Streamlit | FastAPI | [4, 2, 3] | 4 | No |
 | q9 | — | The uploaded document does not provide enough evidence to answer this question. | [1, 2, 4] | — | Yes |
 | q10 | — | The uploaded document does not provide enough evidence to answer this question. | [1, 4, 2] | — | Yes |
 

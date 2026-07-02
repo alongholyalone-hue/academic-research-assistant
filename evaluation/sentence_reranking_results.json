@@ -4,10 +4,10 @@
     "answerable_questions": 8,
     "unsupported_questions": 2,
     "retrieval_hit_at_3": 1.0,
-    "answer_accuracy": 1.0,
+    "answer_accuracy": 0.875,
     "citation_accuracy": 1.0,
     "refusal_accuracy": 1.0,
-    "overall_success_rate": 1.0
+    "overall_success_rate": 0.9
   },
   "results": [
     {
@@ -29,7 +29,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9923241519992132,
-      "retrieval_score": 0.7333333492279053,
+      "retrieval_score": 0.9132705926895142,
       "passed": true
     },
     {
@@ -51,7 +51,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9684182481710053,
-      "retrieval_score": 0.46666669845581055,
+      "retrieval_score": 0.8878208994865417,
       "passed": true
     },
     {
@@ -73,7 +73,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9534024841176318,
-      "retrieval_score": 0.7333333492279053,
+      "retrieval_score": 0.9273015856742859,
       "passed": true
     },
     {
@@ -95,7 +95,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9557009580819624,
-      "retrieval_score": 0.8400000333786011,
+      "retrieval_score": 0.9100526571273804,
       "passed": true
     },
     {
@@ -117,7 +117,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.8049386437926387,
-      "retrieval_score": 0.8892083764076233,
+      "retrieval_score": 0.8892084956169128,
       "passed": true
     },
     {
@@ -132,14 +132,14 @@
         1
       ],
       "retrieval_hit": true,
-      "predicted_answer": "Python",
+      "predicted_answer": "Python and FastAPI",
       "answered": true,
       "answer_correct": true,
       "citation_page": 4,
       "citation_correct": true,
       "refusal_correct": null,
-      "answer_confidence": 0.9896747944312381,
-      "retrieval_score": 0.7714285850524902,
+      "answer_confidence": 0.7228261584484841,
+      "retrieval_score": 0.6795976161956787,
       "passed": true
     },
     {
@@ -154,15 +154,15 @@
         2
       ],
       "retrieval_hit": true,
-      "predicted_answer": "FastAPI",
+      "predicted_answer": "Streamlit",
       "answered": true,
-      "answer_correct": true,
+      "answer_correct": false,
       "citation_page": 4,
       "citation_correct": true,
       "refusal_correct": null,
-      "answer_confidence": 0.9893392759653779,
-      "retrieval_score": 0.7333333492279053,
-      "passed": true
+      "answer_confidence": 0.9716946570856351,
+      "retrieval_score": 0.3502231240272522,
+      "passed": false
     },
     {
       "id": "q8",
@@ -183,7 +183,7 @@
       "citation_correct": true,
       "refusal_correct": null,
       "answer_confidence": 0.9790872397079511,
-      "retrieval_score": 0.6507348418235779,
+      "retrieval_score": 0.5004205703735352,
       "passed": true
     },
     {
@@ -216,8 +216,8 @@
       "expected_page": null,
       "retrieved_pages": [
         1,
-        4,
-        2
+        2,
+        4
       ],
       "retrieval_hit": null,
       "predicted_answer": "The uploaded document does not provide enough evidence to answer this question.",
