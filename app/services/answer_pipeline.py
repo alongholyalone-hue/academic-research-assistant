@@ -15,6 +15,147 @@ INSUFFICIENT_EVIDENCE_MESSAGE = (
 )
 
 
+EXPLANATORY_PREFIXES = (
+    "why ",
+    "explain ",
+    "describe ",
+)
+
+FACTOID_HOW_PREFIXES = (
+    "how many ",
+    "how much ",
+    "how old ",
+    "how long ",
+    "how far ",
+    "how often ",
+)
+
+
+def is_explanatory_question(question: str) -> bool:
+    """
+    Determine whether a question requires an explanation rather
+    than a short factual answer.
+    """
+
+    cleaned_question = " ".join(
+        question.lower().strip().split()
+    )
+
+    if not cleaned_question:
+        return False
+
+    if cleaned_question.startswith(FACTOID_HOW_PREFIXES):
+        return False
+
+    if cleaned_question.startswith("how "):
+        return True
+
+    return cleaned_question.startswith(
+        EXPLANATORY_PREFIXES
+    )
+
+
+QUESTION_WORDS = {
+    "what",
+    "who",
+    "whom",
+    "whose",
+    "where",
+    "when",
+    "why",
+    "how",
+    "which",
+}
+
+
+def normalize_tokens(text: str) -> list[str]:
+    """Convert text into lowercase alphanumeric tokens."""
+
+    return re.findall(r"[a-z0-9]+", text.lower())
+
+
+def remove_leading_question_echo(
+    question: str,
+    context: str,
+) -> str:
+    """
+    Remove a repeated question from the beginning of a passage.
+
+    This handles PDFs that use the user's question as a heading
+    before presenting the actual answer.
+    """
+
+    cleaned_context = context.strip()
+    question_stem = question.strip().rstrip("?!.-:").strip()
+
+    if not question_stem:
+        return cleaned_context
+
+    return re.sub(
+        rf"^\s*{re.escape(question_stem)}\s*[?!.\-:]*\s*",
+        "",
+        cleaned_context,
+        count=1,
+        flags=re.IGNORECASE,
+    ).strip()
+
+
+def is_question_echo(
+    question: str,
+    candidate: str,
+) -> bool:
+    """Detect a sentence that merely repeats the question."""
+
+    question_tokens = normalize_tokens(question)
+    candidate_tokens = normalize_tokens(candidate)
+
+    if not question_tokens or not candidate_tokens:
+        return False
+
+    normalized_question = " ".join(question_tokens)
+    normalized_candidate = " ".join(candidate_tokens)
+
+    if normalized_question == normalized_candidate:
+        return True
+
+    overlap = len(
+        set(question_tokens).intersection(candidate_tokens)
+    ) / len(set(question_tokens))
+
+    return (
+        candidate.strip().endswith("?")
+        and overlap >= 0.80
+    )
+
+
+def is_uninformative_answer(
+    question: str,
+    answer: str,
+) -> bool:
+    """Reject answers that only repeat question words."""
+
+    answer_tokens = normalize_tokens(answer)
+
+    if not answer_tokens:
+        return True
+
+    if (
+        len(answer_tokens) == 1
+        and answer_tokens[0] in QUESTION_WORDS
+    ):
+        return True
+
+    question_tokens = set(normalize_tokens(question))
+
+    if (
+        len(answer_tokens) <= 2
+        and set(answer_tokens).issubset(question_tokens)
+    ):
+        return True
+
+    return False
+
+
 def clean_answer_text(
     question: str,
     extracted_text: str,
@@ -91,12 +232,31 @@ def rerank_sentence_candidates(
     multiple sentences.
     """
 
-    sentence_chunks = create_sentence_chunks(results)
+    all_sentence_chunks = create_sentence_chunks(results)
+
+    sentence_chunks = [
+        chunk
+        for chunk in all_sentence_chunks
+        if not is_question_echo(
+            question=question,
+            candidate=chunk.text,
+        )
+    ]
 
     # No additional ranking is needed when every result already
     # contains only one sentence.
-    if len(sentence_chunks) <= len(results):
-        return results
+    if not sentence_chunks:
+        return []
+
+    if len(all_sentence_chunks) <= len(results):
+        return [
+            result
+            for result in results
+            if not is_question_echo(
+                question=question,
+                candidate=result.chunk.text,
+            )
+    ]
 
     candidate_count = min(
         max(top_k * 2, 3),
@@ -205,11 +365,18 @@ def answer_from_pdf(
     best_selection_score = (-1.0, -1.0)
 
     for result in candidate_results:
-
-        extracted = extract_answer(
+        qa_context = remove_leading_question_echo(
             question=cleaned_question,
             context=result.chunk.text,
         )
+
+        if not qa_context:
+            continue
+
+        extracted = extract_answer(
+            question=cleaned_question,
+            context=qa_context,
+    )
 
         if not extracted.text:
             continue
@@ -220,6 +387,12 @@ def answer_from_pdf(
         )
 
         if not cleaned_answer:
+            continue
+
+        if is_uninformative_answer(
+            question=cleaned_question,
+            answer=cleaned_answer,
+        ):
             continue
 
         if extracted.confidence < minimum_answer_confidence:

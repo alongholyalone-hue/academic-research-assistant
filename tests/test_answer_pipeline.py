@@ -13,6 +13,10 @@ from app.services.text_chunker import TextChunk
 from app.services.answer_pipeline import (
     INSUFFICIENT_EVIDENCE_MESSAGE,
     clean_answer_text,
+    is_question_echo,
+    is_uninformative_answer,
+    is_explanatory_question,
+    remove_leading_question_echo,
     rerank_sentence_candidates,
 )
 
@@ -35,6 +39,41 @@ def create_search_result(
         chunk=chunk,
         score=retrieval_score,
     )
+
+
+def test_leading_question_echo_is_removed() -> None:
+    result = remove_leading_question_echo(
+        question="How does a shark stay afloat?",
+        context=(
+            "How does a shark stay afloat? "
+            "The answer appears later in this passage."
+        ),
+    )
+
+    assert result == (
+        "The answer appears later in this passage."
+    )
+
+
+def test_question_sentence_is_detected_as_echo() -> None:
+    assert is_question_echo(
+        question="How does a shark stay afloat?",
+        candidate="How does a shark stay afloat?",
+    ) is True
+
+
+def test_question_word_is_rejected_as_answer() -> None:
+    assert is_uninformative_answer(
+        question="How does a shark stay afloat?",
+        answer="How",
+    ) is True
+
+
+def test_meaningful_answer_is_not_rejected() -> None:
+    assert is_uninformative_answer(
+        question="How does a shark stay afloat?",
+        answer="an oil-filled liver",
+    ) is False
 
 
 def test_answer_pipeline_selects_best_candidate(
@@ -366,7 +405,7 @@ def test_retrieval_relevance_has_priority_over_qa_confidence(
     assert response.answer == "FastAPI"
     assert response.retrieval_score == pytest.approx(0.82)
 
-    
+
 def test_low_cross_encoder_score_does_not_reject_valid_evidence(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -423,3 +462,36 @@ def test_low_cross_encoder_score_does_not_reject_valid_evidence(
     assert response.answer == "FastAPI"
     assert response.citation is not None
     assert response.citation.page_number == 4
+    
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "How does a shark stay afloat?",
+        "Why do sharks need an oil-filled liver?",
+        "Explain how shark buoyancy works.",
+        "Describe the adaptations that help sharks float.",
+    ],
+)
+def test_explanatory_questions_are_detected(
+    question: str,
+) -> None:
+    assert is_explanatory_question(question) is True
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "What framework does the project use?",
+        "When does the library open?",
+        "How many vacation days are provided?",
+        "How much oil is required?",
+        "Who created the document?",
+        "",
+        "   ",
+    ],
+)
+def test_factoid_questions_are_not_explanatory(
+    question: str,
+) -> None:
+    assert is_explanatory_question(question) is False
